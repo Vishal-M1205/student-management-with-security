@@ -4,7 +4,9 @@ from fastapi.security import OAuth2PasswordBearer, SecurityScopes
 from app.database import get_db_connection
 from fastapi import Depends, HTTPException, status
 from sqlalchemy.ext.asyncio import AsyncSession
-
+from app.schemas.auth import TokenData
+from app.core.security import decode_access_token
+import jwt
 
 from app.interfaces.class_interface import ClassInterface
 from app.interfaces.result_interface import ExamResultInterface
@@ -118,7 +120,7 @@ def get_auth_service(
     return AuthService(session, user_repository, student_repository)
 
 
-async def current_user(
+async def get_current_token_data(
     token: Annotated[str, Depends(oauth2_scheme)],
     security_scopes: SecurityScopes,
     userrepository: Annotated[UserRepository, Depends(get_user_repository)],
@@ -127,3 +129,22 @@ async def current_user(
         status_code=status.HTTP_401_UNAUTHORIZED,
         detail="Could not validate credentials",
     )
+    try:
+        payload = decode_access_token(token)
+
+        if payload["sub"] is None or payload["role"] is None:
+            raise credentials_exception
+
+        token_data = TokenData(**payload)
+
+        for required_scopes in security_scopes.scopes:
+            if required_scopes not in token_data.scopes:
+                raise HTTPException(
+                    status_code=status.HTTP_403_FORBIDDEN,
+                    detail="Not enough permission",
+                )
+
+        return token_data
+    except (jwt.PyJWTError, Exception):
+
+        raise

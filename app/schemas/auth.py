@@ -44,6 +44,13 @@ class Token(BaseModel):
     token_type: str = "bearer"
 
 
+class TokenData(BaseModel):
+    sub: str
+    scopes: list[str] = []
+    role: str
+    exp: int
+
+
 class Login(BaseModel):
     email: EmailStr
     password: str

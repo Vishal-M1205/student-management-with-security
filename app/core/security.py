@@ -30,8 +30,14 @@ def create_access_token(data: dict, expiration_minute: Optional[int] = None):
 
     scopes = ROLE_SCOPES_MAP[encode_data.get("role", "student")]
 
-    encode_data.update({"scope": scopes})
+    encode_data.update({"scopes": scopes})
 
     return jwt.encode(
         payload=encode_data, key=config.jwt_secret_key, algorithm=config.jwt_algorithm
+    )
+
+
+def decode_access_token(token):
+    return jwt.decode(
+        jwt=token, key=config.jwt_secret_key, algorithms=[config.jwt_algorithm]
     )

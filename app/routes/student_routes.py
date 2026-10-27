@@ -1,5 +1,6 @@
 from fastapi import (
     APIRouter,
+    Security,
     status,
     Header,
     Response,
@@ -29,6 +30,7 @@ from app.dependencies import (
     get_id_card_service,
 )
 from typing import Optional, Annotated
+from app.dependencies import get_current_token_data
 
 router = APIRouter(prefix="/students", tags=["Student Management"])
 #! tags - groups the endpoints in the docs
@@ -82,6 +84,7 @@ async def get_all_students(
 async def get_student_by_id(
     student_id: StudentID,
     service: Annotated[StudentService, Depends(get_student_service)],
+    token_data=Security(get_current_token_data, scopes=["student:read"]),
 ):
     """GET student data using id (path parameter)"""
 
