@@ -3,7 +3,7 @@ import logging
 from fastapi import HTTPException
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.interfaces.result_interface import ExamResultInterface
+from app.repositories.interfaces.result_interface import ExamResultInterface
 
 
 class ExamResultService:

@@ -3,7 +3,7 @@ from typing import Optional
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select, func, insert, update, delete, text
 from sqlalchemy.orm import selectinload
-from app.interfaces.student_interface import StudentInterface
+from app.repositories.interfaces.student_interface import StudentInterface
 from app.models.exam_mark import ExamMark
 from app.models.student import Student
 from app.schemas.student import StudentCreate, StudentUpdate

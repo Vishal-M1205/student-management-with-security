@@ -6,7 +6,7 @@ from fastapi import HTTPException, UploadFile, status
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.interfaces.id_card_interface import IdCardInterface
+from app.repositories.interfaces.id_card_interface import IdCardInterface
 from app.schemas.id_card import IdCardCreate
 from app.utils.path_utils import generate_file_path
 

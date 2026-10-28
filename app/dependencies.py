@@ -8,12 +8,13 @@ from app.schemas.auth import TokenData
 from app.core.security import decode_access_token
 import jwt
 
-from app.interfaces.class_interface import ClassInterface
-from app.interfaces.result_interface import ExamResultInterface
-from app.interfaces.id_card_interface import IdCardInterface
-from app.interfaces.subject_interface import SubjectInterface
-from app.interfaces.student_interface import StudentInterface
-from app.interfaces.user_interface import UserInterface
+from app.repositories.interfaces.class_interface import ClassInterface
+from app.repositories.interfaces.result_interface import ExamResultInterface
+from app.repositories.interfaces.id_card_interface import IdCardInterface
+from app.repositories.interfaces.subject_interface import SubjectInterface
+from app.repositories.interfaces.student_interface import StudentInterface
+from app.repositories.interfaces.user_interface import UserInterface
+from app.repositories.interfaces.teacher_interface import TeacherInterface
 from app.repositories.class_repository import ClassRepository
 from app.repositories.student_repository import StudentRepository
 from app.repositories.id_card_repository import IdCardRepository
@@ -21,6 +22,7 @@ from app.repositories.result_repository import ExamResultRepository
 from app.repositories.subject_repository import SubjectRepository
 from app.repositories.exam_mark_repository import ExamMarkRepository
 from app.repositories.user_repository import UserRepository
+from app.repositories.teacher_repository import TeacherRepository
 from app.services.class_service import ClassService
 from app.services.result_service import ExamResultService
 from app.services.student_service import StudentService
@@ -112,18 +114,24 @@ def get_user_repository(session: DB_Session) -> UserInterface:
     return UserRepository(session)
 
 
+def get_teacher_repository(session: DB_Session) -> TeacherInterface:
+    return TeacherRepository(session)
+
+
 def get_auth_service(
     session: DB_Session,
     user_repository: Annotated[UserInterface, Depends(get_user_repository)],
     student_repository: Annotated[StudentInterface, Depends(get_student_repository)],
+    teacher_repository: Annotated[TeacherInterface, Depends(get_teacher_repository)],
 ) -> AuthService:
-    return AuthService(session, user_repository, student_repository)
+    return AuthService(session, user_repository, student_repository, teacher_repository)
 
 
-async def get_current_token_data(
+async def get_current_user(
     token: Annotated[str, Depends(oauth2_scheme)],
     security_scopes: SecurityScopes,
     userrepository: Annotated[UserRepository, Depends(get_user_repository)],
+    session: DB_Session,
 ):
     credentials_exception = HTTPException(
         status_code=status.HTTP_401_UNAUTHORIZED,
@@ -137,6 +145,13 @@ async def get_current_token_data(
 
         token_data = TokenData(**payload)
 
+        user = await userrepository.get_user_by_email(token_data.sub)
+
+        await session.commit()
+
+        if not user:
+            raise credentials_exception
+
         for required_scopes in security_scopes.scopes:
             if required_scopes not in token_data.scopes:
                 raise HTTPException(
@@ -144,7 +159,8 @@ async def get_current_token_data(
                     detail="Not enough permission",
                 )
 
-        return token_data
+        return user
+
     except (jwt.PyJWTError, Exception):
 
         raise

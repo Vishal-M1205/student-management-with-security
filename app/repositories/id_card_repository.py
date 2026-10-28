@@ -1,7 +1,7 @@
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import insert, select
 from sqlalchemy.orm import joinedload
-from app.interfaces.id_card_interface import IdCardInterface
+from app.repositories.interfaces.id_card_interface import IdCardInterface
 from app.models.id_card import IdCard
 from app.models.student import Student
 from app.schemas.id_card import IdCardCreate

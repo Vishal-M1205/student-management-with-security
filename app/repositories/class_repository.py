@@ -1,7 +1,7 @@
 from sqlalchemy import func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.interfaces.class_interface import ClassInterface
+from app.repositories.interfaces.class_interface import ClassInterface
 from app.models.exam_mark import ExamMark
 from app.models.student import Student
 

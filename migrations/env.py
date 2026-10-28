@@ -1,7 +1,6 @@
 import asyncio
 from logging.config import fileConfig
 from app.database import conn_url
-
 from sqlalchemy import pool
 from sqlalchemy.engine import Connection
 from sqlalchemy.ext.asyncio import async_engine_from_config
@@ -12,6 +11,7 @@ from app.models.teacher import Teacher
 from app.models.exam_mark import ExamMark
 from app.models.id_card import IdCard
 from app.models.subject import Subject
+
 from alembic import context
 
 # this is the Alembic Config object, which provides

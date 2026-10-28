@@ -1,7 +1,7 @@
 from typing import Optional
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
-from app.interfaces.user_interface import UserInterface
+from app.repositories.interfaces.user_interface import UserInterface
 from app.models.user import User
 
 
@@ -27,4 +27,3 @@ class UserRepository(UserInterface):
         self.session.add(user)
         await self.session.flush()
         return user
-

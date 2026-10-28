@@ -3,7 +3,7 @@ from fastapi import HTTPException, status
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.types import StudentID
-from app.interfaces.student_interface import StudentInterface
+from app.repositories.interfaces.student_interface import StudentInterface
 from app.models.student import Student
 from app.schemas.student import StudentCreate, StudentPatch, StudentUpdate
 

@@ -30,7 +30,7 @@ from app.dependencies import (
     get_id_card_service,
 )
 from typing import Optional, Annotated
-from app.dependencies import get_current_token_data
+from app.dependencies import get_current_user
 
 router = APIRouter(prefix="/students", tags=["Student Management"])
 #! tags - groups the endpoints in the docs
@@ -54,6 +54,7 @@ async def get_all_students(
     page: int = Query(default=1, ge=1),
     limit: int = Query(default=5, le=10),
     user_agent: Optional[str] = Header(default=None),
+    current_user=Security(get_current_user, scopes=["student:read"]),
 ):
     """
     Return all the students data,
@@ -84,7 +85,7 @@ async def get_all_students(
 async def get_student_by_id(
     student_id: StudentID,
     service: Annotated[StudentService, Depends(get_student_service)],
-    token_data=Security(get_current_token_data, scopes=["student:read"]),
+    current_user=Security(get_current_user, scopes=["student:read"]),
 ):
     """GET student data using id (path parameter)"""
 
@@ -130,6 +131,7 @@ async def update_student(
 async def delete_student(
     student_id: StudentID,
     service: Annotated[StudentService, Depends(get_student_service)],
+    current_user=Security(get_current_user, scopes=["student:manage"]),
 ):
     """Deletes the Student data by Student ID , return no body"""
     await service.delete_student(student_id)
@@ -140,6 +142,7 @@ async def patch_student(
     student_id: StudentID,
     student: StudentPatch,
     service: Annotated[StudentService, Depends(get_student_service)],
+    current_user=Security(get_current_user, scopes=["student:manage"]),
 ):
     """Modifies the data based on the field values"""
     return await service.patch_student(student_id, student)
@@ -149,23 +152,26 @@ async def patch_student(
 async def get_student_exam_result_by_id(
     student_id: StudentID,
     service: Annotated[ExamResultService, Depends(get_exam_result_service)],
+    current_user=Security(get_current_user, scopes=["result:read"]),
 ):
     """Returns the exam result consist of marks, total and grade"""
     return await service.get_student_exam_result_by_id(student_id)
 
 
-@router.get("/{student_id}/academic-summary", response_model=AcademicSummary)
-async def get_academic_summary(
-    student_id: StudentID,
-    service: Annotated[StudentService, Depends(get_student_service)],
-):
-    return await service.get_academic_summary(student_id)
+# @router.get("/{student_id}/academic-summary", response_model=AcademicSummary)
+# async def get_academic_summary(
+#     student_id: StudentID,
+#     service: Annotated[StudentService, Depends(get_student_service)],
+#     current_user=Security(get_current_user, scopes=[]),
+# ):
+#     return await service.get_academic_summary(student_id)
 
 
 @router.get("/{student_id}/marks", response_model=StudentMarkResponse)
 async def get_student_marks(
     student_id: StudentID,
     service: Annotated[StudentService, Depends(get_student_service)],
+    current_user=Security(get_current_user, scopes=["result:read"]),
 ):
     return await service.get_student_marks(student_id)
 
@@ -175,6 +181,7 @@ async def upload_student_id_card(
     student_id: StudentID,
     file: UploadFile,
     service: Annotated[IdCardService, Depends(get_id_card_service)],
+    current_user=Security(get_current_user, scopes=["student:manage"]),
 ):
     return await service.upload_student_id_card(student_id, file)
 
@@ -183,5 +190,6 @@ async def upload_student_id_card(
 async def get_student_id_card(
     student_id: StudentID,
     service: Annotated[IdCardService, Depends(get_id_card_service)],
+    current_user=Security(get_current_user, scopes=["student:read"]),
 ):
     return await service.get_student_id_card(student_id)

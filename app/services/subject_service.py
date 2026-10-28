@@ -2,7 +2,7 @@ import logging
 from fastapi import HTTPException
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.interfaces.subject_interface import SubjectInterface
+from app.repositories.interfaces.subject_interface import SubjectInterface
 from app.schemas.subject import SubjectCreate, SubjectPatch, SubjectUpdate
 
 

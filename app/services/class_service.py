@@ -2,7 +2,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from fastapi.exceptions import HTTPException
 from fastapi import status
 
-from app.interfaces.class_interface import ClassInterface
+from app.repositories.interfaces.class_interface import ClassInterface
 
 
 class ClassService:

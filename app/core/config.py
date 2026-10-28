@@ -8,7 +8,7 @@ class Config(BaseSettings):
     database_port: int
     database_name: str
     database_user: str
-    database_password: int
+    database_password: str
     database_drivername: str
     app_name: str
     app_version: str
@@ -16,7 +16,7 @@ class Config(BaseSettings):
     jwt_algorithm: str
     jwt_expiration_minute: int
 
-    model_config = SettingsConfigDict(env_file=".env.example")
+    model_config = SettingsConfigDict(env_file=".env")
 
 
 config = Config()

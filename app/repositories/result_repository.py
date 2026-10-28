@@ -2,7 +2,7 @@ from sqlalchemy import select
 from sqlalchemy.orm import selectinload
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.interfaces.result_interface import ExamResultInterface
+from app.repositories.interfaces.result_interface import ExamResultInterface
 from app.models.exam_mark import ExamMark
 from app.models.student import Student
 

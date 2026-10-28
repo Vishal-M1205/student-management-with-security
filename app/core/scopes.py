@@ -6,6 +6,13 @@ AVAILABLE_SCOPES = {
 }
 
 ROLE_SCOPES_MAP = {
-    "student": ["me", "student:read"],
-    "teacher": ["me", "student:read", "student:write", "teacher:admin"],
+    "student": ["me", "student:read", "subject:read", "result:read"],
+    "teacher": [
+        "teacher",
+        "student:read",
+        "student:write",
+        "subject:read",
+        "subject:manage",
+        "result:read",
+    ],
 }

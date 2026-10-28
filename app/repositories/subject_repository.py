@@ -1,6 +1,6 @@
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select
-from app.interfaces.subject_interface import SubjectInterface
+from app.repositories.interfaces.subject_interface import SubjectInterface
 from app.schemas.subject import SubjectCreate, SubjectUpdate
 from app.models.subject import Subject
 
