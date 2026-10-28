@@ -2,11 +2,11 @@ from fastapi import FastAPI, Response, Request, status
 from fastapi.responses import JSONResponse
 from sqlalchemy.exc import IntegrityError
 from app.utils.log import setup_logging
-from app.routes.student_routes import router as student_router
-from app.routes.subject_routes import router as subject_router
-from app.routes.exam_mark_routes import router as exam_mark_router
-from app.routes.class_routes import router as class_router
-from app.routes.auth_routes import router as auth_router
+from app.api.routes.student_routes import router as student_router
+from app.api.routes.subject_routes import router as subject_router
+from app.api.routes.exam_mark_routes import router as exam_mark_router
+from app.api.routes.class_routes import router as class_router
+from app.api.routes.auth_routes import router as auth_router
 from app.core.config import config
 import app.models  # Ensures all SQLAlchemy models are registered in Base.metadata
 

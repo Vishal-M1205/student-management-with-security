@@ -2,7 +2,7 @@ import logging
 from fastapi import HTTPException
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.repositories.exam_mark_repository import ExamMarkRepository
+from app.repositories.implementation.exam_mark_repository import ExamMarkRepository
 from app.schemas.exam_mark import ExamMarkCreate, ExamMarkPatch, ExamMarkUpdate
 
 
@@ -15,9 +15,7 @@ class ExamMarkService:
 
     async def get_all_exam_marks(self, **kwargs):
         async with self.session.begin():
-            params = {
-                key: value for key, value in kwargs.items() if value is not None
-            }
+            params = {key: value for key, value in kwargs.items() if value is not None}
             return await self.repository.get_all_exam_marks(params)
 
     async def get_exam_mark_by_id(self, exam_mark_id: int):
@@ -57,4 +55,3 @@ class ExamMarkService:
             if row is None:
                 raise HTTPException(status_code=404, detail="No Exam Mark Found")
             return row
-

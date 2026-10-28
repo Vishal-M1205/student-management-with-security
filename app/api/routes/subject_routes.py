@@ -7,7 +7,7 @@ from app.schemas.subject import (
     SubjectUpdate,
 )
 from app.services.subject_service import SubjectService
-from app.dependencies import get_current_user, get_subject_service
+from app.api.dependencies.dependencies import get_current_user, get_subject_service
 
 router = APIRouter(prefix="/subjects", tags=["Subject Management"])
 

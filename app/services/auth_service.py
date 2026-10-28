@@ -1,9 +1,9 @@
 from fastapi import HTTPException, status
 
 from app.models.user import User
-from app.repositories.student_repository import StudentRepository
-from app.repositories.user_repository import UserRepository
-from app.repositories.teacher_repository import TeacherRepository
+from app.repositories.implementation.student_repository import StudentRepository
+from app.repositories.implementation.user_repository import UserRepository
+from app.repositories.implementation.teacher_repository import TeacherRepository
 from app.schemas.auth import Login, StudentSignup, TeacherSignup, Token
 from sqlalchemy.ext.asyncio import AsyncSession
 

@@ -2,7 +2,7 @@ from typing import Annotated
 
 from fastapi import APIRouter, Depends, status
 
-from app.dependencies import get_class_service
+from app.api.dependencies.dependencies import get_class_service
 from app.schemas.student_class import TopFiveStudents
 from app.services.class_service import ClassService
 

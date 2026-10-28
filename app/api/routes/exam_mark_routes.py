@@ -7,7 +7,7 @@ from app.schemas.exam_mark import (
     ExamMarkUpdate,
 )
 from app.services.exam_mark_service import ExamMarkService
-from app.dependencies import get_exam_mark_service
+from app.api.dependencies.dependencies import get_exam_mark_service
 from typing import Optional
 
 router = APIRouter(prefix="/exam-marks", tags=["Exam Mark Management"])

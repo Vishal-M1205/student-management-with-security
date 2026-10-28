@@ -1,7 +1,7 @@
 from typing import Annotated
 from fastapi import APIRouter, Depends, status
 from fastapi.security import OAuth2PasswordRequestForm
-from app.dependencies import get_auth_service
+from app.api.dependencies.dependencies import get_auth_service
 from app.schemas.auth import Login, StudentSignup, TeacherSignup, Token
 from app.schemas.student import StudentResponse
 from app.schemas.teacher import TeacherResponse

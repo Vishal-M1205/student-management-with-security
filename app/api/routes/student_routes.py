@@ -24,13 +24,13 @@ from app.schemas.student import (
 from app.services.student_service import StudentService
 from app.services.result_service import ExamResultService
 from app.services.id_card_service import IdCardService
-from app.dependencies import (
+from app.api.dependencies.dependencies import (
     get_exam_result_service,
     get_student_service,
     get_id_card_service,
 )
 from typing import Optional, Annotated
-from app.dependencies import get_current_user
+from app.api.dependencies.dependencies import get_current_user
 
 router = APIRouter(prefix="/students", tags=["Student Management"])
 #! tags - groups the endpoints in the docs
