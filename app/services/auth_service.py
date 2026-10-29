@@ -7,7 +7,13 @@ from app.repositories.implementation.teacher_repository import TeacherRepository
 from app.schemas.auth import Login, StudentSignup, TeacherSignup, Token
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.core.security import hash_password, verify_hashed_password, create_access_token
+from app.core.security import (
+    create_refresh_token,
+    hash_password,
+    verify_hashed_password,
+    create_access_token,
+    decode_access_token,
+)
 from app.schemas.student import StudentCreate
 from app.schemas.teacher import TeacherCreate
 
@@ -101,8 +107,31 @@ class AuthService:
                 status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid Credentials"
             )
 
-        token_payload = {"sub": user.email, "role": user.role}
+        access_token_payload = {"sub": user.email, "role": user.role}
+        refresh_token_payload = {"sub": user.email}
 
-        access_token = create_access_token(token_payload)
+        access_token = create_access_token(access_token_payload)
+        refresh_token = create_refresh_token(refresh_token_payload)
 
-        return Token(access_token=access_token)
+        return Token(access_token=access_token, refresh_token=refresh_token)
+
+    async def refresh_access_token(self, refresh_token: str):
+        payload = decode_access_token(refresh_token)
+
+        credential_error = HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid Credentials"
+        )
+
+        if payload.get("type") != "refresh":
+            raise credential_error
+
+        user = await self.user_repository.get_user_by_email(payload.get("sub"))
+
+        if not user or user.is_active == False:
+            raise credential_error
+
+        token_data = {"sub": user.email, "role": user.role}
+
+        access_token = create_access_token(token_data)
+
+        return Token(access_token=access_token, refresh_token=refresh_token)

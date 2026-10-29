@@ -23,14 +23,26 @@ def create_access_token(data: dict, expiration_minute: Optional[int] = None):
         expire_on = datetime.now(timezone.utc) + timedelta(minutes=expiration_minute)
     else:
         expire_on = datetime.now(timezone.utc) + timedelta(
-            minutes=config.jwt_expiration_minute
+            minutes=config.jwt_access_expiration_minute
         )
 
     encode_data.update({"exp": expire_on})
 
     scopes = ROLE_SCOPES_MAP[encode_data.get("role", "student")]
 
-    encode_data.update({"scopes": scopes})
+    encode_data.update({"scopes": scopes, "type": "bearer"})
+
+    return jwt.encode(
+        payload=encode_data, key=config.jwt_secret_key, algorithm=config.jwt_algorithm
+    )
+
+
+def create_refresh_token(data: dict):
+    encode_data = data.copy()
+    expiration_day = datetime.now(timezone.utc) + timedelta(
+        days=config.jwt_refresh_expiration_days
+    )
+    encode_data.update({"exp": expiration_day, "type": "refresh"})
 
     return jwt.encode(
         payload=encode_data, key=config.jwt_secret_key, algorithm=config.jwt_algorithm

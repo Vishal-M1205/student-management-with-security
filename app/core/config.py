@@ -14,7 +14,8 @@ class Config(BaseSettings):
     app_version: str
     jwt_secret_key: str
     jwt_algorithm: str
-    jwt_expiration_minute: int
+    jwt_access_expiration_minute: int
+    jwt_refresh_expiration_days: int
 
     model_config = SettingsConfigDict(env_file=".env")
 

@@ -1,3 +1,5 @@
+import time
+
 from fastapi import FastAPI, Response, Request, status
 from fastapi.responses import JSONResponse
 from sqlalchemy.exc import IntegrityError
@@ -8,7 +10,8 @@ from app.api.routes.exam_mark_routes import router as exam_mark_router
 from app.api.routes.class_routes import router as class_router
 from app.api.routes.auth_routes import router as auth_router
 from app.core.config import config
-import app.models  # Ensures all SQLAlchemy models are registered in Base.metadata
+from uuid import uuid4
+import app.models
 
 import logging
 
@@ -23,6 +26,34 @@ app = FastAPI(
     version=config.app_version,
 )
 # ! returns a FastAPI object to initiate the application
+
+
+@app.middleware("http")
+async def request_middleware(request: Request, call_next):
+    correlation_id = str(uuid4())
+    request.state.correlation_id = correlation_id
+
+    start_time = time.perf_counter()
+
+    response = await call_next(request)
+
+    duration_ms = (time.perf_counter() - start_time) * 1000
+
+    response.headers["Correlation-ID"] = correlation_id
+
+    logger.info(
+        "Request completed",
+        extra={
+            "correlation_id": correlation_id,
+            "method": request.method,
+            "path": request.url.path,
+            "status_code": response.status_code,
+            "duration_ms": round(duration_ms, 2),
+        },
+    )
+
+    return response
+
 
 app.include_router(student_router)
 app.include_router(subject_router)

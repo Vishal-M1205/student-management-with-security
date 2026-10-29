@@ -2,7 +2,13 @@ from typing import Annotated
 from fastapi import APIRouter, Depends, status
 from fastapi.security import OAuth2PasswordRequestForm
 from app.api.dependencies.dependencies import get_auth_service
-from app.schemas.auth import Login, StudentSignup, TeacherSignup, Token
+from app.schemas.auth import (
+    Login,
+    RefreshTokenRequest,
+    StudentSignup,
+    TeacherSignup,
+    Token,
+)
 from app.schemas.student import StudentResponse
 from app.schemas.teacher import TeacherResponse
 from app.services.auth_service import AuthService
@@ -45,3 +51,11 @@ async def login(
     return await service.login(
         Login(email=user_data.username, password=user_data.password)
     )
+
+
+@router.post("/refresh", response_model=Token)
+async def refresh_token(
+    payload: RefreshTokenRequest,
+    service: Annotated[AuthService, Depends(get_auth_service)],
+):
+    return await service.refresh_access_token(payload.refresh_token)
