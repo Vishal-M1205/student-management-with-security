@@ -1,4 +1,5 @@
 import asyncio
+import random
 
 import httpx
 
@@ -50,6 +51,8 @@ class EmailService:
                             raise ValueError
                     except (ValueError, TypeError):
                         delay = min(config.base_delay * (2**attempt), config.max_delay)
+
+                        delay += random.uniform(0, 1)
 
                     await asyncio.sleep(delay)
                     continue
