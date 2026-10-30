@@ -16,6 +16,7 @@ from app.core.security import (
 )
 from app.schemas.student import StudentCreate
 from app.schemas.teacher import TeacherCreate
+from app.services.email_service import EmailService
 
 
 class AuthService:
@@ -26,11 +27,13 @@ class AuthService:
         user_repository: UserRepository,
         student_repository: StudentRepository,
         teacher_repository: TeacherRepository,
+        email_service: EmailService,
     ):
         self.session = session
         self.user_repository = user_repository
         self.student_repository = student_repository
         self.teacher_repository = teacher_repository
+        self.email_service = email_service
 
     async def student_signup(self, student_data: StudentSignup):
         async with self.session.begin():
@@ -112,6 +115,8 @@ class AuthService:
 
         access_token = create_access_token(access_token_payload)
         refresh_token = create_refresh_token(refresh_token_payload)
+
+        await self.email_service.send_login_mail(user.email)
 
         return Token(access_token=access_token, refresh_token=refresh_token)
 

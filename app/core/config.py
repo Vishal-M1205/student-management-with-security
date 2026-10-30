@@ -16,6 +16,8 @@ class Config(BaseSettings):
     jwt_algorithm: str
     jwt_access_expiration_minute: int
     jwt_refresh_expiration_days: int
+    mailjet_api_key: str
+    mailjet_secret_key: str
 
     model_config = SettingsConfigDict(env_file=".env")
 

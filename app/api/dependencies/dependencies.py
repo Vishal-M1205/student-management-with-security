@@ -1,8 +1,9 @@
 from typing import Annotated
 
 from fastapi.security import OAuth2PasswordBearer, SecurityScopes
+import httpx
 from app.database import get_db_connection
-from fastapi import Depends, HTTPException, status
+from fastapi import Depends, HTTPException, Request, status
 from sqlalchemy.ext.asyncio import AsyncSession
 from app.schemas.auth import TokenData
 from app.core.security import decode_access_token
@@ -24,6 +25,7 @@ from app.repositories.implementation.exam_mark_repository import ExamMarkReposit
 from app.repositories.implementation.user_repository import UserRepository
 from app.repositories.implementation.teacher_repository import TeacherRepository
 from app.services.class_service import ClassService
+from app.services.email_service import EmailService
 from app.services.result_service import ExamResultService
 from app.services.student_service import StudentService
 from app.services.id_card_service import IdCardService
@@ -118,13 +120,24 @@ def get_teacher_repository(session: DB_Session) -> TeacherInterface:
     return TeacherRepository(session)
 
 
+def get_httpx_client(request: Request) -> httpx.AsyncClient:
+    return request.app.state.client
+
+
+def get_email_service(client: Annotated[httpx.AsyncClient, Depends(get_httpx_client)]):
+    return EmailService(client)
+
+
 def get_auth_service(
     session: DB_Session,
     user_repository: Annotated[UserInterface, Depends(get_user_repository)],
     student_repository: Annotated[StudentInterface, Depends(get_student_repository)],
     teacher_repository: Annotated[TeacherInterface, Depends(get_teacher_repository)],
+    email_service: Annotated[EmailService, Depends(get_email_service)],
 ) -> AuthService:
-    return AuthService(session, user_repository, student_repository, teacher_repository)
+    return AuthService(
+        session, user_repository, student_repository, teacher_repository, email_service
+    )
 
 
 async def get_current_user(

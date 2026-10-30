@@ -1,8 +1,13 @@
 import time
-
-from fastapi import FastAPI, Response, Request, status
+from typing import Annotated
+import httpx
+from contextlib import asynccontextmanager
+from fastapi import Depends, FastAPI, Response, Request, status
 from fastapi.responses import JSONResponse
 from sqlalchemy.exc import IntegrityError
+from app.api.dependencies.dependencies import get_email_service, get_httpx_client
+from app.exceptions.email_exception import EmailException
+from app.services.email_service import EmailService
 from app.utils.log import setup_logging
 from app.api.routes.student_routes import router as student_router
 from app.api.routes.subject_routes import router as subject_router
@@ -20,10 +25,34 @@ setup_logging()
 logger = logging.getLogger(__name__)
 
 
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    timeout = httpx.Timeout(connect=5, pool=5, read=10, write=10)
+    limits = httpx.Limits(
+        max_connections=10, max_keepalive_connections=5, keepalive_expiry=30
+    )
+    headers = {
+        "Content-type": "application/json",
+        "Accept": "application/json",
+    }
+    #! Above code configure the connection pool
+    async with httpx.AsyncClient(
+        limits=limits,
+        timeout=timeout,
+        headers=headers,
+        auth=(config.mailjet_api_key, config.mailjet_secret_key),
+    ) as client:
+        app.state.client = client
+        yield
+
+
+"""Using the lifespan to reuse the httpx connection"""
+
 app = FastAPI(
     title=config.app_name,
     description="Connected with Postgres and handles CRUD operations",
     version=config.app_version,
+    lifespan=lifespan,
 )
 # ! returns a FastAPI object to initiate the application
 
@@ -77,6 +106,17 @@ async def global_exception_handler(request: Request, exc: Exception):
     )
 
 
+@app.exception_handler(EmailException)
+async def email_exception_handler(request: Request, exc: EmailException):
+    logger.exception(
+        "Email Service Error %s %s: %s", request.method, request.url.path, exc
+    )
+    return JSONResponse(
+        status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+        content={"detail": "Email Service Error"},
+    )
+
+
 @app.get("/", tags=["Home Page"])
 def home(response: Response):
     """Root endpoint value is returned"""
@@ -87,3 +127,8 @@ def home(response: Response):
 
 
 """Creating a /students end point of GET to take data from the db"""
+
+
+# @app.get("/external-api")
+# async def external_api(service: Annotated[EmailService, Depends(get_email_service)]):
+#     return await service.send_login_mail("vishalmanivannan1205@gmail.com")
