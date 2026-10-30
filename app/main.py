@@ -42,14 +42,7 @@ async def request_middleware(request: Request, call_next):
     response.headers["Correlation-ID"] = correlation_id
 
     logger.info(
-        "Request completed",
-        extra={
-            "correlation_id": correlation_id,
-            "method": request.method,
-            "path": request.url.path,
-            "status_code": response.status_code,
-            "duration_ms": round(duration_ms, 2),
-        },
+        f"Request completed - correlation_id {correlation_id} - method {request.method} - path {request.url.path} - status_code {response.status_code} - duration_ms {round(duration_ms, 2)}",
     )
 
     return response
