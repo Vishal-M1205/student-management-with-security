@@ -1,3 +1,7 @@
+import pytest
+import pytest_asyncio
+
+
 def test_create_subject_success(client, auth_headers):
     response = client.post(
         "/subjects/", json={"name": "Mathematics"}, headers=auth_headers
@@ -14,12 +18,17 @@ def test_create_subject_validation_failure(client, auth_headers):
     assert response.status_code == 422
 
 
-def test_get_all_subjects(client, auth_headers):
+@pytest.mark.asyncio
+async def test_get_all_subjects(async_httpx_client, auth_headers):
 
-    client.post("/subjects/", json={"name": "Physics"}, headers=auth_headers)
-    client.post("/subjects/", json={"name": "Chemistry"}, headers=auth_headers)
+    await async_httpx_client.post(
+        "/subjects/", json={"name": "Physics"}, headers=auth_headers
+    )
+    await async_httpx_client.post(
+        "/subjects/", json={"name": "Chemistry"}, headers=auth_headers
+    )
 
-    response = client.get("/subjects/", headers=auth_headers)
+    response = await async_httpx_client.get("/subjects/", headers=auth_headers)
 
     assert response.status_code == 200
     data = response.json()

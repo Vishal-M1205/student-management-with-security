@@ -38,6 +38,9 @@ class EmailService:
                 response = await self.client.post(
                     "https://api.mailjet.com/v3.1/send", json=payload
                 )
+
+                if response.status_code == 200:
+                    break
                 if response.status_code == 429:
                     if attempt == config.max_retries - 1:
 

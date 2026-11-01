@@ -22,7 +22,7 @@ class Config(BaseSettings):
     base_delay: int
     max_delay: int
 
-    model_config = SettingsConfigDict(env_file=".env")
+    model_config = SettingsConfigDict(env_file=".env.example")
 
 
 config = Config()

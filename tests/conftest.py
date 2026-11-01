@@ -1,7 +1,9 @@
+import httpx
 import psycopg
 import pytest
 from fastapi.testclient import TestClient
 
+import pytest_asyncio
 from sqlalchemy import NullPool
 from app.core.config import config
 from app.core.security import create_access_token
@@ -60,6 +62,16 @@ def teacher_data():
 def teacher_signup(client, teacher_data):
     response = client.post("/auth/signup/teacher", json=teacher_data.model_dump())
     assert response.status_code == 201
+
+
+@pytest_asyncio.fixture
+async def async_httpx_client():
+    app.dependency_overrides[get_db_connection] = get_test_session
+    transport = httpx.ASGITransport(app=app)
+
+    async with httpx.AsyncClient(transport=transport, base_url="http://test") as client:
+        yield client
+    app.dependency_overrides.clear()
 
 
 @pytest.fixture(autouse=True)
